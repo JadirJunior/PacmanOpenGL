@@ -148,6 +148,6 @@ void desenhaCreeper()
 void drawPlayer(float x, float y, float z)
 {
 	glScalef(0.05,0.05,0.05);
-	glTranslatef(x, y, z);
+	glTranslatef(x, y + 5.2, z);
 	desenhaCreeper();
 }

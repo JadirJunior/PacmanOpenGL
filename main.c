@@ -74,12 +74,16 @@ void init() {
 	cubos[1].speedZ = 0.0;
 }
 
+void calculateCoordinates(int i, int j, float* x, float* y)
+{
+	*x = i * 4.0;
+	*y = j * 4.0;
+}
 
 
 void drawTable(char** m)
 {
 	glPushMatrix();
-
 	int maxSize = xTabSize() > yTabSize() ? xTabSize() : yTabSize();
 	glScalef(1.0 / maxSize, 1.0 / maxSize, 1.0 / maxSize);
 	glTranslatef(-(xTabSize() - 1), -(yTabSize() - 1), 0.0);
@@ -93,16 +97,22 @@ void drawTable(char** m)
 			glScalef(0.8, 0.8, 0.8);
 			if (m[i][j] == 1)
 				colorcube();
+
+			printf("(%d, %d): (%f, %f)\n", i, j, i*2.0, j*2.0);
+			printf("\n");
 			glPopMatrix();
 		}
 	}
-	glPopMatrix();
-}
 
-void calculateCoordinates(int i, int j, float* x, float* y)
-{
-	*x = i * 2.0 + 2;
-	*y = j * 2.0 - 2.5;
+	float x, y;
+	//calculateCoordinates(i, j, &x, &y);
+	glPushMatrix();
+	glTranslatef(i*2, j*2, 0.0);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	colorForm(1.0, 1.0, 1.0);
+	glPopMatrix();
+
+	glPopMatrix();
 }
 
 void display(void)
@@ -119,13 +129,6 @@ void display(void)
 	glPushMatrix();
 	glRotatef(-90.0, 1.0, 0.0, 0.0);
 	drawTable(map);
-	glPopMatrix();
-
-
-	float x, y;
-	calculateCoordinates(i, j, &x, &y);
-	glPushMatrix();
-	drawPlayer(x, 5.2, y);
 	glPopMatrix();
 
 	glFlush();
@@ -147,14 +150,23 @@ void mouse(int btn, int state, int x, int y)
 }
 
 void teclado(char key, int x, int y) {
+	printf("X: %d, Y: %d\n", i, j);
 	switch (key) {
 		case 'w':
 		case 'W':
-			j = j >= yTabSize() ? j : j+3.0;
+			j++;
 			break;
 		case 's':
 		case 'S':
-			j = j <= -yTabSize() ? -yTabSize() : j-3.0;
+			j--;
+			break;
+		case 'd':
+		case 'D':
+			i++;
+			break;
+		case 'a':
+		case 'A':
+			i--;
 			break;
 		case 'E': specialCreeper = !specialCreeper; break;
 		case 'e': specialCreeper = !specialCreeper; break;
