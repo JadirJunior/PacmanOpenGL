@@ -4,7 +4,8 @@
 
 #include "headers/baseForm.h"
 
-#include <gl.h>
+//#include <gl.h>
+#include <GL/gl.h>
 
 GLfloat vertices[][3] = { {-1.0,-1.0,-1.0},{1.0,-1.0,-1.0},
 {1.0,1.0,-1.0}, {-1.0,1.0,-1.0}, {-1.0,-1.0,1.0},

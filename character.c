@@ -1,7 +1,9 @@
 //
 // Created by jadir on 12/01/2025.
 //
-#include <gl.h>
+//#include <gl.h>
+#include <GL/gl.h>
+
 
 #include "headers/characters.h"
 #include "headers/baseForm.h"
@@ -141,12 +143,12 @@ void desenhaCreeper()
 	colorForm(0.09, 0.51, 0.06);
 	glPopMatrix();
 
-	desenhaFaceCreeper();
 }
 
 
 void drawPlayer(float x, float y, float z)
 {
 	glTranslatef(x, y, z);
+	glScalef(0.75f, 0.75f, 0.75f);
 	desenhaCreeper();
 }

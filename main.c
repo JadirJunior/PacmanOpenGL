@@ -105,7 +105,7 @@ void drawTable(char** m)
 	calculateCoordinates(i, j, &x, &y);
 	glPushMatrix();
 	glRotatef(90, 1.0, 0.0, 0.0);
-	drawPlayer(x, 3.8, y);
+	drawPlayer(x, 3.1, y);
 	glPopMatrix();
 
 	glPopMatrix();
@@ -146,26 +146,40 @@ void mouse(int btn, int state, int x, int y)
 }
 
 void teclado(char key, int x, int y) {
+	int aux;
 	switch (key) {
 		case 's':
 		case 'S':
-			if (j >= 0) j = 0;
-			else j++;
+			aux = j;
+			if (aux >= 0) aux = 0;
+			else aux++;
+			//validar se a proxima posicao é 1 ou 0 na matriz
+			if (map[i][abs(aux)] == 1) j = aux;
 			break;
 		case 'w':
 		case 'W':
-			if (j <= -yTabSize()+1) j = -yTabSize()+1;
-			else j--;
+			aux = j;
+			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
+			else aux--;
+			if (map[i][abs(aux)] == 1) j = aux;
 			break;
 		case 'd':
 		case 'D':
-			if (i >= xTabSize()-1) i = xTabSize()-1;
-			else i++;
+			aux = i;
+			if (aux >= xTabSize()-1) aux = xTabSize()-1;
+			else aux++;
+			if (map[aux][abs(j)] == 1) i = aux;
 			break;
 		case 'a':
 		case 'A':
-			if (i <= 0) i = 0;
-			else i--;
+			aux = i;
+			if (aux <= 0) aux = 0;
+			else aux--;
+			printf("auxJ: %d\n", abs(aux));
+			printf("i: %d\n", i);
+			printf("map[][]: %d\n",map[aux][j]);
+			if (map[aux][abs(j)] == 1) i = aux;
+
 			break;
 		case 'E': specialCreeper = !specialCreeper; break;
 		case 'e': specialCreeper = !specialCreeper; break;
@@ -270,7 +284,7 @@ void main(int argc, char** argv)
 	// 	exit(0);
 	// }
 	printf("Reading map...\n");
-	openMapsFile("pm_simple.txt");       // Opem map file
+	openMapsFile("pm_simple.txt");       // Open map file
 	map = nextMap();             // read the first map from file
 	printMap();                  // print the map to the console
 
