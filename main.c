@@ -76,8 +76,8 @@ void init() {
 
 void calculateCoordinates(int i, int j, float* x, float* y)
 {
-	*x = i * 4.0;
-	*y = j * 4.0;
+	*x = i * 2.0;
+	*y = j * 2.0;
 }
 
 
@@ -97,19 +97,15 @@ void drawTable(char** m)
 			glScalef(0.8, 0.8, 0.8);
 			if (m[i][j] == 1)
 				colorcube();
-
-			printf("(%d, %d): (%f, %f)\n", i, j, i*2.0, j*2.0);
-			printf("\n");
 			glPopMatrix();
 		}
 	}
 
 	float x, y;
-	//calculateCoordinates(i, j, &x, &y);
+	calculateCoordinates(i, j, &x, &y);
 	glPushMatrix();
-	glTranslatef(i*2, j*2, 0.0);
 	glRotatef(90, 1.0, 0.0, 0.0);
-	colorForm(1.0, 1.0, 1.0);
+	drawPlayer(x, 3.8, y);
 	glPopMatrix();
 
 	glPopMatrix();
@@ -150,23 +146,26 @@ void mouse(int btn, int state, int x, int y)
 }
 
 void teclado(char key, int x, int y) {
-	printf("X: %d, Y: %d\n", i, j);
 	switch (key) {
-		case 'w':
-		case 'W':
-			j++;
-			break;
 		case 's':
 		case 'S':
-			j--;
+			if (j >= 0) j = 0;
+			else j++;
+			break;
+		case 'w':
+		case 'W':
+			if (j <= -yTabSize()+1) j = -yTabSize()+1;
+			else j--;
 			break;
 		case 'd':
 		case 'D':
-			i++;
+			if (i >= xTabSize()-1) i = xTabSize()-1;
+			else i++;
 			break;
 		case 'a':
 		case 'A':
-			i--;
+			if (i <= 0) i = 0;
+			else i--;
 			break;
 		case 'E': specialCreeper = !specialCreeper; break;
 		case 'e': specialCreeper = !specialCreeper; break;
