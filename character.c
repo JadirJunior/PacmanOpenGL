@@ -2,6 +2,7 @@
 // Created by jadir on 12/01/2025.
 //
 //#include <gl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <GL/gl.h>
 
@@ -156,6 +157,30 @@ void drawPlayer(Player player)
 }
 
 
+void rotate(Player player, char** map, int side) {
+	switch (side) {
+	case 1: // Left body rotation
+		player->direction = LEFT;
+		printf("VIRANDO P ESQUERDA\n");
+	break;
+	case 2: // Right body rotation
+		player->direction = RIGHT;
+		printf("VIRANDO P DIREITA\n");
+	break;
+	case 3: // Front body rotation
+		player->direction = UP;
+	printf("VIRANDO P CIMA\n");
+	break;
+	case 4: // Back body rotation
+		player->direction = DOWN;
+	printf("VIRANDO P BAIXO\n");
+	break;
+	default:
+		printf("Invalid rotation command.\n");
+	break;
+	}
+}
+
 void move(Player player, int i, int j, char** map)
 {
 	int aux;
@@ -163,12 +188,14 @@ void move(Player player, int i, int j, char** map)
 	{
 		if (i > 0)
 		{
+			rotate(player, map, RIGHT);
 			aux = player->i;
 			if (aux >= xTabSize()-1) aux = xTabSize()-1;
 			else aux++;
 			if (map[aux][abs(j)] == 1) player->i = aux;
 		} else
 		{
+			rotate(player, map, LEFT);
 			aux = player->i;
 			if (aux <= 0) aux = 0;
 			else aux--;
@@ -180,12 +207,14 @@ void move(Player player, int i, int j, char** map)
 	{
 		if (j > 0)
 		{
+			rotate(player, map, DOWN);
 			aux = player->j;
 			if (aux >= 0) aux = 0;
 			else aux++;
 			if (map[i][abs(aux)] == 1) player->j = aux;
 		} else
 		{
+			rotate(player, map, UP);
 			aux =  player->j;
 			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
 			else aux--;
@@ -193,3 +222,8 @@ void move(Player player, int i, int j, char** map)
 		}
 	}
 }
+
+
+
+
+

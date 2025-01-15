@@ -8,15 +8,25 @@
 typedef struct player* Player;
 typedef struct ghost* Ghost;
 
+#define LEFT 1
+#define RIGHT 2
+#define UP 3
+#define DOWN 4
+
 struct player
 {
     int i, j;
+    // 1 - esquerda / 2 - direita / 3 - frente / 4 - trás
+    //enum direction dir;
+    int direction;
     int* m[16];
 };
 
 struct ghost
 {
     int i, j;
+    // 1 - esquerda / 2 - direita / 3 - frente / 4 - trás
+    int direction;
     int intelligent;
     int color[3];
     int* m[16];

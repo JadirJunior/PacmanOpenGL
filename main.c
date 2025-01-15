@@ -139,23 +139,29 @@ void mouse(int btn, int state, int x, int y)
 	}
 }
 
+
+
 void teclado(char key, int x, int y) {
 	int aux;
 	switch (key) {
 		case 's':
 		case 'S':
+			//rotate player to the back
 			move(player, 0, 1, map);
 			break;
 		case 'w':
 		case 'W':
+			//rotate player to front
 			move(player, 0, -1, map);
 			break;
 		case 'd':
 		case 'D':
+			//rotate player to the right
 			move(player, 1, 0, map);
 			break;
 		case 'a':
 		case 'A':
+			//rotate player to the left
 			move(player, -1, 0, map);
 			break;
 		case 'E': specialCreeper = !specialCreeper; break;
@@ -255,6 +261,7 @@ void main(int argc, char** argv)
 	player = malloc(sizeof(Player));
 	player->i = 0;
 	player->j = 0;
+	//player->dir = FRONT;
 	// PACMAN - MAP
 	// if (argc <= 1) {
 	// 	printf("Please run as:\n");
