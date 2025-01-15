@@ -227,7 +227,7 @@ void move(Player player, int i, int j, char** map)
 			aux = player->i;
 			if (aux >= xTabSize()-1) aux = xTabSize()-1;
 			else aux++;
-			if (map[aux][abs(j)] == 1) player->i = aux;
+			if (map[aux][abs(player->j)] == 1) player->i = aux;
 		} else
 		{
 			rotate(player, map, LEFT);
@@ -235,7 +235,7 @@ void move(Player player, int i, int j, char** map)
 			if (aux <= 0) aux = 0;
 			else aux--;
 
-			if (map[aux][abs(j)] == 1) player->i = aux;
+			if (map[aux][abs(player->j)] == 1) player->i = aux;
 		}
 	}
 
@@ -247,14 +247,14 @@ void move(Player player, int i, int j, char** map)
 			aux = player->j;
 			if (aux >= 0) aux = 0;
 			else aux++;
-			if (map[i][abs(aux)] == 1) player->j = aux;
+			if (map[player->i][abs(aux)] == 1) player->j = aux;
 		} else
 		{
 			rotate(player, map, UP);
 			aux =  player->j;
 			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
 			else aux--;
-			if (map[i][abs(aux)] == 1) player->j = aux;
+			if (map[player->i][abs(aux)] == 1) player->j = aux;
 		}
 	}
 }

@@ -102,7 +102,6 @@ void drawTable(char** m)
 	glRotatef(90, 1.0, 0.0, 0.0);
 	drawPlayer(player);
 	glPopMatrix();
-
 	glPopMatrix();
 }
 
