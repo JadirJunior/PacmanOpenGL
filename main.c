@@ -47,6 +47,8 @@ int actualY = 0;
 
 static GLfloat theta[] = {0.0,0.0,0.0};
 
+Player player;
+
 char** map = NULL;
 
 int i = 0, j = 0;
@@ -74,12 +76,6 @@ void init() {
 	cubos[1].speedZ = 0.0;
 }
 
-void calculateCoordinates(int i, int j, float* x, float* y)
-{
-	*x = i * 2.0;
-	*y = j * 2.0;
-}
-
 
 void drawTable(char** m)
 {
@@ -101,11 +97,10 @@ void drawTable(char** m)
 		}
 	}
 
-	float x, y;
-	calculateCoordinates(i, j, &x, &y);
+
 	glPushMatrix();
 	glRotatef(90, 1.0, 0.0, 0.0);
-	drawPlayer(x, 3.1, y);
+	drawPlayer(player);
 	glPopMatrix();
 
 	glPopMatrix();
@@ -142,7 +137,6 @@ void mouse(int btn, int state, int x, int y)
 
 		if (btn == 4) radius += 0.5;
 	}
-
 }
 
 void teclado(char key, int x, int y) {
@@ -150,36 +144,19 @@ void teclado(char key, int x, int y) {
 	switch (key) {
 		case 's':
 		case 'S':
-			aux = j;
-			if (aux >= 0) aux = 0;
-			else aux++;
-			//validar se a proxima posicao é 1 ou 0 na matriz
-			if (map[i][abs(aux)] == 1) j = aux;
+			move(player, 0, 1, map);
 			break;
 		case 'w':
 		case 'W':
-			aux = j;
-			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
-			else aux--;
-			if (map[i][abs(aux)] == 1) j = aux;
+			move(player, 0, -1, map);
 			break;
 		case 'd':
 		case 'D':
-			aux = i;
-			if (aux >= xTabSize()-1) aux = xTabSize()-1;
-			else aux++;
-			if (map[aux][abs(j)] == 1) i = aux;
+			move(player, 1, 0, map);
 			break;
 		case 'a':
 		case 'A':
-			aux = i;
-			if (aux <= 0) aux = 0;
-			else aux--;
-			printf("auxJ: %d\n", abs(aux));
-			printf("i: %d\n", i);
-			printf("map[][]: %d\n",map[aux][j]);
-			if (map[aux][abs(j)] == 1) i = aux;
-
+			move(player, -1, 0, map);
 			break;
 		case 'E': specialCreeper = !specialCreeper; break;
 		case 'e': specialCreeper = !specialCreeper; break;
@@ -275,6 +252,9 @@ void main(int argc, char** argv)
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseDrag);
 
+	player = malloc(sizeof(Player));
+	player->i = 0;
+	player->j = 0;
 	// PACMAN - MAP
 	// if (argc <= 1) {
 	// 	printf("Please run as:\n");

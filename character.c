@@ -2,11 +2,13 @@
 // Created by jadir on 12/01/2025.
 //
 //#include <gl.h>
+#include <stdlib.h>
 #include <GL/gl.h>
 
 
 #include "headers/characters.h"
 #include "headers/baseForm.h"
+#include "headers/pm_maps.h"
 
 float animation = 0.0;
 
@@ -146,9 +148,48 @@ void desenhaCreeper()
 }
 
 
-void drawPlayer(float x, float y, float z)
+void drawPlayer(Player player)
 {
-	glTranslatef(x, y, z);
+	glTranslatef(player->i*2, 3.1, player->j*2);
 	glScalef(0.75f, 0.75f, 0.75f);
 	desenhaCreeper();
+}
+
+
+void move(Player player, int i, int j, char** map)
+{
+	int aux;
+	if (i != 0)
+	{
+		if (i > 0)
+		{
+			aux = player->i;
+			if (aux >= xTabSize()-1) aux = xTabSize()-1;
+			else aux++;
+			if (map[aux][abs(j)] == 1) player->i = aux;
+		} else
+		{
+			aux = player->i;
+			if (aux <= 0) aux = 0;
+			else aux--;
+			if (map[aux][abs(j)] == 1) player->i = aux;
+		}
+	}
+
+	if (j != 0)
+	{
+		if (j > 0)
+		{
+			aux = player->j;
+			if (aux >= 0) aux = 0;
+			else aux++;
+			if (map[i][abs(aux)] == 1) player->j = aux;
+		} else
+		{
+			aux =  player->j;
+			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
+			else aux--;
+			if (map[i][abs(aux)] == 1) player->j = aux;
+		}
+	}
 }
