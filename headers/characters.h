@@ -19,7 +19,7 @@ struct player
     // 1 - esquerda / 2 - direita / 3 - frente / 4 - trás
     //enum direction dir;
     int direction;
-    int* m[16];
+    GLfloat m[16];
 };
 
 struct ghost
@@ -29,11 +29,12 @@ struct ghost
     int direction;
     int intelligent;
     int color[3];
-    int* m[16];
+    GLfloat m[16];
 };
 
 void drawPlayer(Player player);
 void updateAnimation(float newPos);
 void move(Player player, int i, int j, char** map);
+Player initPlayer();
 
 #endif //CHARACTERS_H

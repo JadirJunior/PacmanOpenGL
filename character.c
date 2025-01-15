@@ -153,27 +153,62 @@ void drawPlayer(Player player)
 {
 	glTranslatef(player->i*2, 3.1, player->j*2);
 	glScalef(0.75f, 0.75f, 0.75f);
+	glMultMatrixf(player->m);
 	desenhaCreeper();
 }
 
+void rotatePlayer(Player player, GLfloat ang, GLfloat x, GLfloat y, GLfloat z)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glRotatef(ang,x,y,z);
+	glMultMatrixf(player->m);
+	glGetFloatv(GL_MODELVIEW_MATRIX,player->m);
+	glPopMatrix();
+}
 
 void rotate(Player player, char** map, int side) {
+	float angle;
 	switch (side) {
-	case 1: // Left body rotation
+	case LEFT: // Left body rotation
+
+		if (player->direction == UP) angle = 90.0;
+		else if (player->direction == DOWN) angle = -90.0;
+		else if (player->direction == RIGHT) angle = 180.0;
+		else angle = 0.0;
+
+		rotatePlayer(player, angle, 0.0, 1.0, 0.0);
 		player->direction = LEFT;
-		printf("VIRANDO P ESQUERDA\n");
 	break;
-	case 2: // Right body rotation
+	case RIGHT: // Right body rotation
+		if (player->direction == UP) angle = -90.0;
+		else if (player->direction == DOWN) angle = 90.0;
+		else if (player->direction == LEFT) angle = 180.0;
+		else angle = 0.0;
+
+		rotatePlayer(player, angle, 0.0, 1.0, 0.0);
 		player->direction = RIGHT;
-		printf("VIRANDO P DIREITA\n");
 	break;
-	case 3: // Front body rotation
+	case UP: // Front body rotation
+
+		if (player->direction == LEFT) angle = -90.0;
+		else if (player->direction == RIGHT) angle = 90.0;
+		else if (player->direction == DOWN) angle = 180.0;
+		else angle = 0.0;
+
+		rotatePlayer(player, angle, 0.0, 1.0, 0.0);
+
 		player->direction = UP;
-	printf("VIRANDO P CIMA\n");
 	break;
-	case 4: // Back body rotation
+	case DOWN: // Back body rotation
+		if (player->direction == LEFT) angle = 90.0;
+		else if (player->direction == RIGHT) angle = -90.0;
+		else if (player->direction == UP) angle = 180.0;
+		else angle = 0.0;
+
+		rotatePlayer(player, angle, 0.0, 1.0, 0.0);
 		player->direction = DOWN;
-	printf("VIRANDO P BAIXO\n");
 	break;
 	default:
 		printf("Invalid rotation command.\n");
@@ -199,6 +234,7 @@ void move(Player player, int i, int j, char** map)
 			aux = player->i;
 			if (aux <= 0) aux = 0;
 			else aux--;
+
 			if (map[aux][abs(j)] == 1) player->i = aux;
 		}
 	}
@@ -223,7 +259,20 @@ void move(Player player, int i, int j, char** map)
 	}
 }
 
+Player initPlayer()
+{
+	Player player = (Player)malloc(sizeof(struct player));
+	player->i = 0;
+	player->j = 0;
+	player->direction = UP;
 
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glGetFloatv(GL_MODELVIEW_MATRIX,player->m);
+	glPopMatrix();
 
+	rotatePlayer(player, 180.0, 0.0, 1.0, 0.0);
 
-
+	return player;
+}

@@ -258,9 +258,8 @@ void main(int argc, char** argv)
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseDrag);
 
-	player = malloc(sizeof(Player));
-	player->i = 0;
-	player->j = 0;
+	player = initPlayer();
+
 	//player->dir = FRONT;
 	// PACMAN - MAP
 	// if (argc <= 1) {
