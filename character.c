@@ -151,7 +151,9 @@ void desenhaCreeper()
 
 void drawPlayer(Player player)
 {
-	glTranslatef(player->i*2, 3.1, player->j*2);
+	if (player->moving == 1) glTranslatef(player->fromMovement[0]*2, 3.1, player->fromMovement[1]*2);
+	else glTranslatef(player->i*2, 3.1, player->j*2);
+
 	glScalef(0.75f, 0.75f, 0.75f);
 	glMultMatrixf(player->m);
 	desenhaCreeper();
@@ -218,6 +220,7 @@ void rotate(Player player, char** map, int side) {
 
 void move(Player player, int i, int j, char** map)
 {
+	if (player->moving == 1) return;
 	int aux;
 	if (i != 0)
 	{
@@ -227,7 +230,13 @@ void move(Player player, int i, int j, char** map)
 			aux = player->i;
 			if (aux >= xTabSize()-1) aux = xTabSize()-1;
 			else aux++;
-			if (map[aux][abs(player->j)] == 1) player->i = aux;
+			if (map[aux][abs(player->j)] == 1)
+			{
+				player->fromMovement[0] = player->i;
+				player->fromMovement[1] = player->j;
+				player->nextPos[0] = aux;
+				player->moving = 1;
+			}
 		} else
 		{
 			rotate(player, map, LEFT);
@@ -235,7 +244,13 @@ void move(Player player, int i, int j, char** map)
 			if (aux <= 0) aux = 0;
 			else aux--;
 
-			if (map[aux][abs(player->j)] == 1) player->i = aux;
+			if (map[aux][abs(player->j)] == 1)
+			{
+				player->fromMovement[0] = player->i;
+				player->fromMovement[1] = player->j;
+				player->nextPos[0] = aux;
+				player->moving = 1;
+			}
 		}
 	}
 
@@ -247,16 +262,31 @@ void move(Player player, int i, int j, char** map)
 			aux = player->j;
 			if (aux >= 0) aux = 0;
 			else aux++;
-			if (map[player->i][abs(aux)] == 1) player->j = aux;
+			if (map[player->i][abs(aux)] == 1)
+			{
+				player->fromMovement[0] = player->i;
+				player->fromMovement[1] = player->j;
+				player->nextPos[1] = aux;
+				player->moving = 1;
+			}
 		} else
 		{
 			rotate(player, map, UP);
 			aux =  player->j;
 			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
 			else aux--;
-			if (map[player->i][abs(aux)] == 1) player->j = aux;
+			if (map[player->i][abs(aux)] == 1)
+			{
+				player->fromMovement[0] = player->i;
+				player->fromMovement[1] = player->j;
+				player->nextPos[1] = aux;
+				player->moving = 1;
+			}
 		}
 	}
+
+
+
 }
 
 Player initPlayer()
@@ -265,6 +295,10 @@ Player initPlayer()
 	player->i = 0;
 	player->j = 0;
 	player->direction = UP;
+	player->moving = 0;
+	player->nextPos[0] = 0;
+	player->nextPos[1] = 0;
+	player->speed = 3.5f;
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();

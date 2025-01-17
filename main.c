@@ -132,9 +132,9 @@ void mouse(int btn, int state, int x, int y)
 
 	if (mod == GLUT_ACTIVE_CTRL)
 	{
-		if (btn == 3) radius -= 0.5;
+		if (btn == 3) radius = radius <= 3.0 ? 3.0 : radius - 0.5;
 
-		if (btn == 4) radius += 0.5;
+		if (btn == 4) radius = radius >= 15.0 ? 15.0 : radius+0.5;
 	}
 }
 
@@ -197,6 +197,41 @@ void update(int valor)
 	}
 
 	updateAnimation(internalPos);
+
+	if (player->moving)
+	{
+		switch (player->direction)
+		{
+		case UP:
+			if (player->fromMovement[1] <= player->nextPos[1])
+			{
+				player->j = player->nextPos[1];
+				player->moving = 0;
+			} else player->fromMovement[1] -= player->speed * (TEMPO/1000.0);
+			break;
+		case DOWN:
+			if (player->fromMovement[1] >= player->nextPos[1])
+			{
+				player->j = player->nextPos[1];
+				player->moving = 0;
+			} else player->fromMovement[1] += player->speed * (TEMPO/1000.0);
+			break;
+		case LEFT:
+			if (player->fromMovement[0] <= player->nextPos[0])
+			{
+				player->i = player->nextPos[0];
+				player->moving = 0;
+			} else player->fromMovement[0] -= player->speed * (TEMPO/1000.0);
+			break;
+		case RIGHT:
+			if (player->fromMovement[0] >= player->nextPos[0])
+			{
+				player->i = player->nextPos[0];
+				player->moving = 0;
+			} else player->fromMovement[0] += player->speed * (TEMPO/1000.0);
+			break;
+		}
+	}
 
 	glutPostRedisplay();
 	glutTimerFunc(TEMPO, update, TEMPO);

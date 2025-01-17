@@ -20,6 +20,11 @@ struct player
     //enum direction dir;
     int direction;
     GLfloat m[16];
+    int moving;
+    float speed;
+
+    float fromMovement[2];
+    int nextPos[2]; // 0 - i / 1 - j
 };
 
 struct ghost
