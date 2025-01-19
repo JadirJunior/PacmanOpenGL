@@ -151,8 +151,8 @@ void desenhaCreeper()
 
 void drawPlayer(Player player)
 {
-	if (player->moving == 1) glTranslatef(player->fromMovement[0]*2, 3.1, player->fromMovement[1]*2);
-	else glTranslatef(player->i*2, 3.1, player->j*2);
+	glTranslatef(player->fromMovement[0]*2, 3.1, player->fromMovement[1]*2);
+	//else glTranslatef(player->i*2, 3.1, player->j*2);
 
 	glScalef(0.75f, 0.75f, 0.75f);
 	glMultMatrixf(player->m);
@@ -220,7 +220,7 @@ void rotate(Player player, char** map, int side) {
 
 void move(Player player, int i, int j, char** map)
 {
-	if (player->moving == 1) return;
+	if (player->moving == 1 || player->isDeath == 1) return;
 	int aux;
 	if (i != 0)
 	{
@@ -230,8 +230,9 @@ void move(Player player, int i, int j, char** map)
 			aux = player->i;
 			if (aux >= xTabSize()-1) aux = xTabSize()-1;
 			else aux++;
-			if (map[aux][abs(player->j)] == 1)
+			if (map[aux][abs(player->j)] != 0)
 			{
+				map[player->i][abs(player->j)] = 3;
 				player->fromMovement[0] = player->i;
 				player->fromMovement[1] = player->j;
 				player->nextPos[0] = aux;
@@ -244,8 +245,9 @@ void move(Player player, int i, int j, char** map)
 			if (aux <= 0) aux = 0;
 			else aux--;
 
-			if (map[aux][abs(player->j)] == 1)
+			if (map[aux][abs(player->j)] != 0)
 			{
+				map[player->i][abs(player->j)] = 3;
 				player->fromMovement[0] = player->i;
 				player->fromMovement[1] = player->j;
 				player->nextPos[0] = aux;
@@ -262,8 +264,9 @@ void move(Player player, int i, int j, char** map)
 			aux = player->j;
 			if (aux >= 0) aux = 0;
 			else aux++;
-			if (map[player->i][abs(aux)] == 1)
+			if (map[player->i][abs(aux)] != 0)
 			{
+				map[player->i][abs(player->j)] = 3;
 				player->fromMovement[0] = player->i;
 				player->fromMovement[1] = player->j;
 				player->nextPos[1] = aux;
@@ -275,8 +278,9 @@ void move(Player player, int i, int j, char** map)
 			aux =  player->j;
 			if (aux <= -yTabSize()+1) aux = -yTabSize()+1;
 			else aux--;
-			if (map[player->i][abs(aux)] == 1)
+			if (map[player->i][abs(aux)] != 0)
 			{
+				map[player->i][abs(player->j)] = 3;
 				player->fromMovement[0] = player->i;
 				player->fromMovement[1] = player->j;
 				player->nextPos[1] = aux;
@@ -284,21 +288,28 @@ void move(Player player, int i, int j, char** map)
 			}
 		}
 	}
-
-
-
 }
 
-Player initPlayer()
+Player initPlayer(char** map)
 {
 	Player player = (Player)malloc(sizeof(struct player));
-	player->i = 0;
-	player->j = 0;
+	int i, j;
+	do
+	{
+		i = rand() % xTabSize();
+		j = -(rand() % yTabSize());
+	} while (map[i][abs(j)] != 1);
+
+	player->i = i;
+	player->j = j;
 	player->direction = UP;
 	player->moving = 0;
-	player->nextPos[0] = 0;
-	player->nextPos[1] = 0;
+	player->nextPos[0] = i;
+	player->nextPos[1] = j;
+	player->fromMovement[0] = player->i;
+	player->fromMovement[1] = player->j;
 	player->speed = 3.5f;
+	player->isDeath = 0;
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
