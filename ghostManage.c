@@ -36,10 +36,18 @@ Ghost createGhost(int intelligent, char** map)
     ghost->speed = 2.0f;
     ghost->internalRotation = 0.0f;
 
-
-    ghost->color[0] = (float)rand() / (float)RAND_MAX;
-    ghost->color[1] = (float)rand() / (float)RAND_MAX;
-    ghost->color[2] = (float)rand() / (float)RAND_MAX;
+    if (ghost->intelligent == 1)
+    {
+        ghost->color[0] = 0.0f;
+        ghost->color[1] = 1.0f;
+        ghost->color[2] = 0.0f;
+        ghost->speed = 2.5f;
+    } else
+    {
+        ghost->color[0] = (float)rand() / (float)RAND_MAX;
+        ghost->color[1] = (float)rand() / (float)RAND_MAX;
+        ghost->color[2] = (float)rand() / (float)RAND_MAX;
+    }
 
     ghost->rotateActivation[0] = 0.0f;
     ghost->rotateActivation[1] = 0.0f;

@@ -9,5 +9,4 @@ void colorForm(float r, float g, float b);
 void polygon(int a, int b, int c, int d);
 void colorcube(void);
 
-
 #endif //BASEFORM_H
