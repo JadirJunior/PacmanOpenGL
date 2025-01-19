@@ -22,6 +22,7 @@ struct player
     int moving;
     float speed;
     int isDeath;
+    int score;
 
     float fromMovement[2];
     int nextPos[2]; // 0 - i / 1 - j

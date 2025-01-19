@@ -311,6 +311,7 @@ Player initPlayer(char** map)
 	player->fromMovement[1] = player->j;
 	player->speed = 3.5f;
 	player->isDeath = 0;
+	player->score = 0;
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
