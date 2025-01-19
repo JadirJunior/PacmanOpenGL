@@ -230,6 +230,7 @@ void move(Player player, int i, int j, char** map)
 			aux = player->i;
 			if (aux >= xTabSize()-1) aux = xTabSize()-1;
 			else aux++;
+
 			if (map[aux][abs(player->j)] != 0)
 			{
 				map[player->i][abs(player->j)] = 3;

@@ -18,13 +18,14 @@
 Ghost createGhost(int intelligent, char** map)
 {
     Ghost ghost = (Ghost)malloc(sizeof(struct ghost));
-    int i = rand() % xTabSize();
-    int j = -(rand() % yTabSize());
-    while (map[i][abs(j)] != 1)
+
+    int i, j;
+    do
     {
         i = rand() % xTabSize();
         j = -(rand() % yTabSize());
-    }
+    } while (map[i][abs(j)] != 1);
+
     ghost->i = i;
     ghost->j = j;
     ghost->direction = (rand() % 4) + 1;
@@ -36,9 +37,9 @@ Ghost createGhost(int intelligent, char** map)
     ghost->internalRotation = 0.0f;
 
 
-    ghost->color[0] = 1.0f;
-    ghost->color[1] = 0.0f;
-    ghost->color[2] = 0.0f;
+    ghost->color[0] = (float)rand() / (float)RAND_MAX;
+    ghost->color[1] = (float)rand() / (float)RAND_MAX;
+    ghost->color[2] = (float)rand() / (float)RAND_MAX;
 
     ghost->rotateActivation[0] = 0.0f;
     ghost->rotateActivation[1] = 0.0f;
@@ -84,8 +85,8 @@ void drawGhosts(Ghost* ghosts)
 
         glScalef(0.75f, 0.75f, 0.75f);
         glMultMatrixf(ghosts[i]->m);
-        //colorForm(ghosts[i]->color[0], ghosts[i]->color[1], ghosts[i]->color[2]);
-        colorcube();
+        colorForm(ghosts[i]->color[0], ghosts[i]->color[1], ghosts[i]->color[2]);
+        //colorcube();
         glPopMatrix();
     }
 }
