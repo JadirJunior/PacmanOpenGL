@@ -1058,8 +1058,6 @@ void main(int argc, char** argv)
     arg = (char*) malloc( sizeof(strlen(argv[1]) + 1) );
     arg = argv[1];
 
-    //resetGame(1);
-
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 }
