@@ -6,7 +6,6 @@
 #define CHARACTERS_H
 
 typedef struct player* Player;
-typedef struct ghost* Ghost;
 
 #define LEFT 1
 #define RIGHT 2
@@ -22,24 +21,15 @@ struct player
     GLfloat m[16];
     int moving;
     float speed;
+    int isDeath;
 
     float fromMovement[2];
     int nextPos[2]; // 0 - i / 1 - j
 };
 
-struct ghost
-{
-    int i, j;
-    // 1 - esquerda / 2 - direita / 3 - frente / 4 - trás
-    int direction;
-    int intelligent;
-    int color[3];
-    GLfloat m[16];
-};
-
 void drawPlayer(Player player);
 void updateAnimation(float newPos);
 void move(Player player, int i, int j, char** map);
-Player initPlayer();
+Player initPlayer(char** map);
 
 #endif //CHARACTERS_H
