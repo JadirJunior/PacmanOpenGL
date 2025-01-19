@@ -14,6 +14,7 @@
 #include <math.h>
 #include "headers/baseForm.h"
 #include "headers/pm_maps.h"
+#include "headers/ghostManage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -21,22 +22,12 @@
 
 // Variáveis Globais
 #define TEMPO 40
-#define NCubos 2
 
-struct cubo {
-	float theta[3];
-	float escala;
-	float xCubo;
-	float yCubo;
-	float speedX, speedY, speedZ;
-};
 
 float angleX = 0.0f;
 float angleY = 0.0f;
 float angleZ = 0.0f;
 float radius = 5.0f;
-struct cubo cubos[NCubos];
-float v = 0.5;
 int specialCreeper = 0;
 
 float internalPos = 0.0;
@@ -45,36 +36,11 @@ float internalVel = 3.0;
 int actualX = 0;
 int actualY = 0;
 
-static GLfloat theta[] = {0.0,0.0,0.0};
 
 Player player;
-
+Ghost* ghosts;
 char** map = NULL;
 
-int i = 0, j = 0;
-
-
-void init() {
-	cubos[0].theta[0] = 0.0;
-	cubos[0].theta[1] = 0.0;
-	cubos[0].theta[2] = 0.0;
-	cubos[0].escala = 1.0;
-	cubos[0].xCubo = -1.5;
-	cubos[0].yCubo = 0.0;
-	cubos[0].speedX = 0.5;
-	cubos[0].speedY = 0.3;
-	cubos[0].speedZ = 0.0;
-
-	cubos[1].theta[0] = 0.0;
-	cubos[1].theta[1] = 0.0;
-	cubos[1].theta[2] = 0.0;
-	cubos[1].escala = 1.0;
-	cubos[1].xCubo = 1.5;
-	cubos[1].yCubo = 0.0;
-	cubos[1].speedX = -0.5;
-	cubos[1].speedY = -0.4;
-	cubos[1].speedZ = 0.0;
-}
 
 
 void drawTable(char** m)
@@ -91,17 +57,32 @@ void drawTable(char** m)
 			glPushMatrix();
 			glTranslatef(i * 2.0, j * 2.0, 0.0);
 			glScalef(0.8, 0.8, 0.8);
-			if (m[i][j] == 1)
+			if (m[i][j] == 1 || m[i][j] == 5)
 				colorcube();
+			if (m[i][j] == 2 || m[i][j] == 3 || m[i][j] == 4)
+				colorForm(0.5, 0.5, 0.5);
 			glPopMatrix();
 		}
 	}
 
+	if (player->isDeath != 1)
+	{
+		glPushMatrix();
+		glRotatef(90, 1.0, 0.0, 0.0);
+		drawPlayer(player);
+		glPopMatrix();
+
+		if (player->moving == 0)
+		{
+			map[player->i][abs(player->j)] = 2;
+		}
+	}
 
 	glPushMatrix();
 	glRotatef(90, 1.0, 0.0, 0.0);
-	drawPlayer(player);
+	drawGhosts(ghosts);
 	glPopMatrix();
+
 	glPopMatrix();
 }
 
@@ -132,13 +113,25 @@ void mouse(int btn, int state, int x, int y)
 
 	if (mod == GLUT_ACTIVE_CTRL)
 	{
-		if (btn == 3) radius = radius <= 3.0 ? 3.0 : radius - 0.5;
+		if (btn == 3) radius = radius <= 2.5 ? 2.5 : radius - 0.5;
 
 		if (btn == 4) radius = radius >= 15.0 ? 15.0 : radius+0.5;
 	}
 }
 
-
+void printTeste()
+{
+	for (int j = yTabSize() - 1; j >= 0; j--) {
+		for (int i = 0; i < xTabSize(); i++)
+			if (map[i][abs(j)] == 1)
+				printf("O ");
+			else if (map[i][abs(j)] == 2)
+				printf("2 ");
+			else
+				printf("  ");
+		printf("\n");
+	}
+}
 
 void teclado(char key, int x, int y) {
 	int aux;
@@ -163,8 +156,8 @@ void teclado(char key, int x, int y) {
 			//rotate player to the left
 			move(player, -1, 0, map);
 			break;
-		case 'E': specialCreeper = !specialCreeper; break;
-		case 'e': specialCreeper = !specialCreeper; break;
+		case 'E': printTeste(); break;
+		case 'e': printTeste(); break;
 	}
 }
 
@@ -198,40 +191,132 @@ void update(int valor)
 
 	updateAnimation(internalPos);
 
+	//Player movement
 	if (player->moving)
 	{
-		switch (player->direction)
+
+		for (int i = 0; i < (numGhosts() + numSmartGhosts()); i++)
+		{
+			if ((player->fromMovement[0] == ghosts[i]->nextPos[0] && player->fromMovement[1] == ghosts[i]->nextPos[1]) ||
+				player->nextPos[0] == ghosts[i]->fromMovement[0] && ghosts[i]->fromMovement[1] == player->nextPos[1])
+			{
+				player->isDeath = 1;
+				break;
+			}
+		}
+
+		if (player->isDeath != 1)
+		{
+			switch (player->direction)
+			{
+			case UP:
+				if (player->fromMovement[1] <= player->nextPos[1])
+				{
+					player->j = player->nextPos[1];
+					if (map[player->i][abs(player->j)] == 4 || map[player->i][abs(player->j)] == 5) player->isDeath = 1; // Pacman morreu
+					player->moving = 0;
+				} else player->fromMovement[1] -= player->speed * (TEMPO/1000.0);
+				break;
+			case DOWN:
+				if (player->fromMovement[1] >= player->nextPos[1])
+				{
+					player->j = player->nextPos[1];
+					if (map[player->i][abs(player->j)] == 4 || map[player->i][abs(player->j)] == 5) player->isDeath = 1; // Pacman morreu
+					player->moving = 0;
+				} else player->fromMovement[1] += player->speed * (TEMPO/1000.0);
+				break;
+			case LEFT:
+				if (player->fromMovement[0] <= player->nextPos[0])
+				{
+					player->i = player->nextPos[0];
+					if (map[player->i][abs(player->j)] == 4 || map[player->i][abs(player->j)] == 5) player->isDeath = 1; // Pacman morreu
+					player->moving = 0;
+				} else player->fromMovement[0] -= player->speed * (TEMPO/1000.0);
+				break;
+			case RIGHT:
+				if (player->fromMovement[0] >= player->nextPos[0])
+				{
+					player->i = player->nextPos[0];
+					if (map[player->i][abs(player->j)] == 4 || map[player->i][abs(player->j)] == 5) player->isDeath = 1; // Pacman morreu
+					player->moving = 0;
+				} else player->fromMovement[0] += player->speed * (TEMPO/1000.0);
+				break;
+			}
+		}
+	}
+
+
+	//Ghost movement
+	for (int i = 0; i < (numGhosts() + numSmartGhosts()); i++)
+	{
+		if (ghosts[i]->moving == 0)
+		{
+			ghosts[i]->direction = (rand()%4) + 1;
+
+			if (ghosts[i]->direction == UP) moveGhost(ghosts[i], 0, -1, map);
+			if (ghosts[i]->direction == DOWN) moveGhost(ghosts[i], 0, 1, map);
+			if (ghosts[i]->direction == LEFT) moveGhost(ghosts[i], -1, 0, map);
+			if (ghosts[i]->direction == RIGHT) moveGhost(ghosts[i], 1, 0, map);
+			continue;
+		}
+
+		switch (ghosts[i]->direction)
 		{
 		case UP:
-			if (player->fromMovement[1] <= player->nextPos[1])
+			if (ghosts[i]->fromMovement[1] <= ghosts[i]->nextPos[1])
 			{
-				player->j = player->nextPos[1];
-				player->moving = 0;
-			} else player->fromMovement[1] -= player->speed * (TEMPO/1000.0);
+				ghosts[i]->j = ghosts[i]->nextPos[1];
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 2) player->isDeath = 1; // Pacman morreu
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 3) map[ghosts[i]->i][abs(ghosts[i]->j)] = 4;
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 1) map[ghosts[i]->i][abs(ghosts[i]->j)] = 5;
+
+				ghosts[i]->moving = 0;
+				ghosts[i]->internalRotation = 0.0f;
+			} else {ghosts[i]->fromMovement[1] -= ghosts[i]->speed * (TEMPO/1000.0); ghosts[i]->internalRotation -= 15.0; }
 			break;
 		case DOWN:
-			if (player->fromMovement[1] >= player->nextPos[1])
+			if (ghosts[i]->fromMovement[1] >= ghosts[i]->nextPos[1])
 			{
-				player->j = player->nextPos[1];
-				player->moving = 0;
-			} else player->fromMovement[1] += player->speed * (TEMPO/1000.0);
+				ghosts[i]->j = ghosts[i]->nextPos[1];
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 2) player->isDeath = 1; // Pacman morreu
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 3) map[ghosts[i]->i][abs(ghosts[i]->j)] = 4;
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 1) map[ghosts[i]->i][abs(ghosts[i]->j)] = 5;
+
+				ghosts[i]->moving = 0;
+				ghosts[i]->internalRotation = 0.0f;
+			} else {ghosts[i]->fromMovement[1] += ghosts[i]->speed * (TEMPO/1000.0); ghosts[i]->internalRotation += 15.0;}
 			break;
 		case LEFT:
-			if (player->fromMovement[0] <= player->nextPos[0])
+			if (ghosts[i]->fromMovement[0] <= ghosts[i]->nextPos[0])
 			{
-				player->i = player->nextPos[0];
-				player->moving = 0;
-			} else player->fromMovement[0] -= player->speed * (TEMPO/1000.0);
+				ghosts[i]->i = ghosts[i]->nextPos[0];
+
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 2) player->isDeath = 1; // Pacman morreu
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 3) map[ghosts[i]->i][abs(ghosts[i]->j)] = 4;
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 1) map[ghosts[i]->i][abs(ghosts[i]->j)] = 5;
+
+
+				ghosts[i]->moving = 0;
+				ghosts[i]->internalRotation = 0.0f;
+			} else {ghosts[i]->fromMovement[0] -= ghosts[i]->speed * (TEMPO/1000.0); ghosts[i]->internalRotation += 15.0;}
 			break;
 		case RIGHT:
-			if (player->fromMovement[0] >= player->nextPos[0])
+			if (ghosts[i]->fromMovement[0] >= ghosts[i]->nextPos[0])
 			{
-				player->i = player->nextPos[0];
-				player->moving = 0;
-			} else player->fromMovement[0] += player->speed * (TEMPO/1000.0);
+				ghosts[i]->i = ghosts[i]->nextPos[0];
+
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 2) player->isDeath = 1; // Pacman morreu
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 3) map[ghosts[i]->i][abs(ghosts[i]->j)] = 4;
+				if (map[ghosts[i]->i][abs(ghosts[i]->j)] == 1) map[ghosts[i]->i][abs(ghosts[i]->j)] = 5;
+
+
+				ghosts[i]->moving = 0;
+				ghosts[i]->internalRotation = 0.0f;
+			} else {ghosts[i]->fromMovement[0] += ghosts[i]->speed * (TEMPO/1000.0); ghosts[i]->internalRotation -= 15.0;}
 			break;
 		}
 	}
+
 
 	glutPostRedisplay();
 	glutTimerFunc(TEMPO, update, TEMPO);
@@ -279,6 +364,7 @@ void mouseWheel()
 
 void main(int argc, char** argv)
 {
+	srand(time(NULL));
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
@@ -291,9 +377,6 @@ void main(int argc, char** argv)
 	glutTimerFunc(TEMPO, update, TEMPO);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseDrag);
-
-	player = initPlayer();
-
 	//player->dir = FRONT;
 	// PACMAN - MAP
 	// if (argc <= 1) {
@@ -306,7 +389,12 @@ void main(int argc, char** argv)
 	map = nextMap();             // read the first map from file
 	printMap();                  // print the map to the console
 
+
+	player = initPlayer(map);
+	ghosts = initGhosts(map);
+	printGhosts(ghosts);
+
+
 	glEnable(GL_DEPTH_TEST);
-	init();
 	glutMainLoop();
 }
