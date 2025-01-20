@@ -671,6 +671,15 @@ void teclado(char key, int x, int y)
             free(cardsMaps);
             cardsMaps = NULL;
 
+            for (int i = 0; i < xTabSize();i++)
+            {
+                for (int j = 0; j < yTabSize(); j++)
+                {
+                    free(map[i][j]);
+                }
+            }
+            map = NULL;
+
             closeMapsFile();
             mapNumber = -1;
 
