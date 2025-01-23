@@ -90,7 +90,6 @@ void desenhaCreeper()
 	glPushMatrix();
 	glTranslatef(0.0, 0.8, 0.0);
 	glRotatef(30*animation, 0.0, 1.0, 0.0);
-	//glRotatef(30, 0.0, 1.0, 0.0);
 	desenhaFaceCreeper();
 	colorForm(0.0, 1.0, 0.0);
 	//colorcube();

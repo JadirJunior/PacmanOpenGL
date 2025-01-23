@@ -108,7 +108,6 @@ void updateCardPositions(int width, int height) {
     }
 }
 
-
 void drawTable(char** m)
 {
     glPushMatrix();
@@ -184,27 +183,41 @@ void drawTableImage(Card card) {
     glPopMatrix();
 }
 
+char** copyMap(char** srcMap) {
+    if (!srcMap) return NULL;
+
+    // Aloca memória para o novo mapa
+    char** newMap = (char**)malloc(sizeof(char*) * xTabSize());
+    for (int i = 0; i < xTabSize(); i++) {
+        newMap[i] = (char*)malloc(sizeof(char) * yTabSize());
+        for (int j = 0; j < yTabSize(); j++) {
+            newMap[i][j] = srcMap[i][j];
+        }
+    }
+
+    return newMap;
+}
+
 void loadAllMaps()
 {
     printf("Reading map...\n");
     openMapsFile(arg); // Open map file
-    int i = 0;
 
-    cardsMaps = (Card*)malloc(sizeof(Card) * numberOfMaps());
+    cardsMaps = (Card*) malloc(sizeof(Card) * numberOfMaps());
 
 
-    char** m = NULL;
+    printf("Number of maps: %d\n", numberOfMaps());
 
-    m = nextMap();
 
     int gap = windowWidth / (numberOfMaps() + 1);   // Espaçamento entre os cards
     int mapWidth = gap * 0.8;
 
     if (mapWidth > 400) mapWidth = 400;
 
-    while (m != NULL)
+    int i = 0;
+    while (i < numberOfMaps())
     {
-        cardsMaps[i].map = m;
+        cardsMaps[i].map = copyMap(nextMap());
         cardsMaps[i].x = gap *(i + 1) - mapWidth / 2;
         cardsMaps[i].y = windowHeight / 2 - 30;
         cardsMaps[i].width = mapWidth;
@@ -213,8 +226,6 @@ void loadAllMaps()
         cardsMaps[i].ySize = yTabSize();
         cardsMaps[i].mapNumber = i;
         i++;
-
-        m = nextMap();
     }
 
 }
@@ -231,7 +242,7 @@ void resetMap()
 
     printf("Reading map...\n");
     openMapsFile(arg); // Open map file
-    int i = 0;
+
     for (int i = 0; i <= mapNumber; i++)
     {
         map = nextMap();
@@ -432,7 +443,6 @@ void display(void)
         } else
         {
             for (int i = 0; i < numberOfMaps(); i++) {
-                //drawRectangle(cardsMaps[i], 1);
                 drawTableImage(cardsMaps[i]);
             }
         }
@@ -1066,6 +1076,8 @@ void main(int argc, char** argv)
 
     arg = (char*) malloc( sizeof(strlen(argv[1]) + 1) );
     arg = argv[1];
+
+    loadAllMaps();
 
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
